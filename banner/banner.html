@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Adviser Blog Banner</title>
+    <script>
+      // ── Change these to reuse the banner for another adviser ──────────────
+      // The first word goes on line one, the rest on line two.
+      const ADVISER_NAME = 'Anjorin Henry Fasan'
+      const PHOTO = 'photo.jpg'
+      // Vertical crop of the photo inside the frame (0% = top, 100% = bottom).
+      const PHOTO_POSITION_Y = '22%'
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --navy: #152f4e;
+        --red: #cf102d;
+        --grey: #737373;
+        --frame: #efefef;
+        --white: #ffffff;
+        --shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        --font: 'Montserrat', system-ui, sans-serif;
+
+        /* Layout on the 1200×587 canvas */
+        --panel-x: 48px; /* 4% */
+        --panel-w: 420px; /* 4% → 39% */
+        --panel-y: 141px; /* 24% */
+        --panel-h: 252px; /* 24% → 67% */
+        --text-pad: 36px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: transparent;
+        padding: 40px;
+      }
+
+      .banner {
+        position: relative;
+        width: 1200px;
+        height: 587px;
+        background: var(--navy);
+        border-radius: 12px;
+        overflow: hidden;
+        font-family: var(--font);
+      }
+
+      /* Photo frame: x 27% → 92%, y 15% → 86% */
+      .photo {
+        position: absolute;
+        left: 324px;
+        top: 88px;
+        width: 780px;
+        height: 417px;
+        border: 10px solid var(--frame);
+        background: var(--frame);
+        box-shadow: var(--shadow);
+      }
+
+      .photo img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 22%;
+      }
+
+      /* Red name panel, overlapping the photo's left edge */
+      .name {
+        position: absolute;
+        left: var(--panel-x);
+        top: var(--panel-y);
+        width: var(--panel-w);
+        height: var(--panel-h);
+        padding: 0 24px 0 var(--text-pad);
+        display: flex;
+        align-items: center;
+        background: var(--red);
+        box-shadow: var(--shadow);
+        z-index: 2;
+      }
+
+      .name h1 {
+        color: var(--white);
+        font-weight: 800;
+        font-size: 56px;
+        line-height: 1.1;
+        text-transform: uppercase;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+      }
+
+      .name h1 span {
+        display: block;
+      }
+
+      /* URL strip directly under the panel */
+      .url {
+        position: absolute;
+        left: var(--panel-x);
+        top: calc(var(--panel-y) + var(--panel-h));
+        width: var(--panel-w);
+        height: 50px;
+        padding-left: var(--text-pad);
+        display: flex;
+        align-items: center;
+        background: var(--grey);
+        color: var(--white);
+        font-weight: 500;
+        font-size: 22px;
+        z-index: 2;
+      }
+
+      .logo {
+        position: absolute;
+        left: var(--panel-x);
+        top: 474px;
+        width: 200px;
+        height: auto;
+        z-index: 2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="banner" id="banner">
+      <div class="photo"><img id="photo" alt="" /></div>
+      <div class="name"><h1 id="name"></h1></div>
+      <div class="url">www.tavistockprotect.com</div>
+      <img class="logo" src="logo.png" alt="Tavistock Protect" />
+    </div>
+
+    <script>
+      const [first, ...rest] = ADVISER_NAME.toUpperCase().split(' ')
+      const nameEl = document.getElementById('name')
+      for (const line of [first, rest.join(' '), 'BLOG']) {
+        const span = document.createElement('span')
+        span.textContent = line
+        nameEl.appendChild(span)
+      }
+
+      const photo = document.getElementById('photo')
+      photo.src = PHOTO
+      photo.style.objectPosition = `center ${PHOTO_POSITION_Y}`
+
+      // Shrink the name from 56px until the longest line fits inside the panel
+      // with clear space on the right. Exposes the result for the export script.
+      window.bannerReady = document.fonts.ready.then(async () => {
+        await Promise.all(
+          [...document.images].map((img) =>
+            img.complete ? null : new Promise((r) => (img.onload = img.onerror = r)),
+          ),
+        )
+        const panel = nameEl.parentElement
+        const maxWidth = panel.clientWidth - 36 - 24
+        let size = 56
+        nameEl.style.fontSize = `${size}px`
+        while (nameEl.scrollWidth > maxWidth && size > 20) {
+          size -= 1
+          nameEl.style.fontSize = `${size}px`
+        }
+        return { fontSize: size, textWidth: nameEl.scrollWidth, maxWidth }
+      })
+    </script>
+  </body>
+</html>
