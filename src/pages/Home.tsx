@@ -110,7 +110,7 @@ export function Home() {
           <div className="help-head">
             <h2 id="help-heading">How I can help you</h2>
             <p className="sub">
-              The protection I work with for individuals, families and
+              The protection products I work with for individuals, families and
               business owners.
             </p>
           </div>
